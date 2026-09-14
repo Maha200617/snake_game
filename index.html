@@ -28,10 +28,10 @@
         body.theme-retro { background-color: #1b263b; color: #e0e1dd; }
     </style>
 </head>
-<body class="theme-neon flex flex-col h-[100vh] h-[100dvh] justify-between items-center py-2 px-3">
+<body class="theme-neon flex flex-col h-[100vh] h-[100dvh] justify-between items-center py-1 px-2">
 
     <!-- TOP STATS BAR -->
-    <header id="topBar" class="w-full max-w-md flex justify-between items-center bg-zinc-900/90 backdrop-blur-md border border-zinc-800 px-4 py-2 rounded-2xl shadow-lg hidden">
+    <header id="topBar" class="w-full max-w-md flex justify-between items-center bg-zinc-900/90 backdrop-blur-md border border-zinc-800 px-4 py-1.5 rounded-2xl shadow-lg hidden">
         <div class="flex items-center gap-4">
             <div>
                 <span class="text-[9px] text-cyan-400 tracking-widest font-bold uppercase block">Score</span>
@@ -47,14 +47,14 @@
                 <span class="text-[9px] text-yellow-400 tracking-widest font-bold uppercase block">High</span>
                 <span id="highScoreVal" class="arcade-font text-xs">0</span>
             </div>
-            <button onclick="togglePause()" class="bg-zinc-800 hover:bg-zinc-700 px-3 py-1.5 rounded-xl arcade-font text-[10px] text-white border border-zinc-700">❚❚</button>
+            <button onclick="togglePause()" class="bg-zinc-800 hover:bg-zinc-700 px-3 py-1 rounded-xl arcade-font text-[10px] text-white border border-zinc-700">❚❚</button>
         </div>
     </header>
 
     <!-- MAIN GAME VIEWPORT -->
     <main class="relative flex justify-center items-center my-auto w-full flex-grow">
         <div class="relative rounded-3xl overflow-hidden border-2 border-zinc-800 shadow-2xl bg-black/40 flex justify-center items-center">
-            <canvas id="gameCanvas" width="520" height="520" class="block max-w-full max-h-[52vh] object-contain"></canvas>
+            <canvas id="gameCanvas" width="520" height="520" class="block max-w-full max-h-[64vh] object-contain"></canvas>
             
             <!-- SCREENS / OVERLAYS -->
              
@@ -182,15 +182,20 @@
         </div>
     </main>
 
-    <!-- BOTTOM CONTROL DECK (Ergonomic Thumb D-Pad safely inside screen bounds) -->
+    <!-- BOTTOM CONTROL DECK (Foolproof 3x3 D-Pad Grid for All Mobile Devices) -->
     <footer id="controlDeck" class="w-full max-w-md pb-1 flex flex-col items-center hidden">
-        <div class="grid grid-cols-3 gap-2 w-40 h-24">
+        <div class="grid grid-cols-3 gap-1.5 w-40">
             <div></div>
-            <button ontouchstart="setDir('UP'); event.preventDefault();" onclick="setDir('UP')" class="bg-zinc-800 border border-zinc-700 active:bg-cyan-500 active:text-black rounded-xl flex items-center justify-center text-lg text-cyan-400 shadow">▲</button>
+            <button ontouchstart="setDir('UP'); event.preventDefault();" onclick="setDir('UP')" class="bg-zinc-800/90 border border-zinc-700 active:bg-cyan-500 active:text-black rounded-xl h-11 flex items-center justify-center text-xl text-cyan-400 shadow">▲</button>
             <div></div>
-            <button ontouchstart="setDir('LEFT'); event.preventDefault();" onclick="setDir('LEFT')" class="bg-zinc-800 border border-zinc-700 active:bg-cyan-500 active:text-black rounded-xl flex items-center justify-center text-lg text-cyan-400 shadow">◀</button>
-            <button ontouchstart="setDir('DOWN'); event.preventDefault();" onclick="setDir('DOWN')" class="bg-zinc-800 border border-zinc-700 active:bg-cyan-500 active:text-black rounded-xl flex items-center justify-center text-lg text-cyan-400 shadow">▼</button>
-            <button ontouchstart="setDir('RIGHT'); event.preventDefault();" onclick="setDir('RIGHT')" class="bg-zinc-800 border border-zinc-700 active:bg-cyan-500 active:text-black rounded-xl flex items-center justify-center text-lg text-cyan-400 shadow">▶</button>
+            
+            <button ontouchstart="setDir('LEFT'); event.preventDefault();" onclick="setDir('LEFT')" class="bg-zinc-800/90 border border-zinc-700 active:bg-cyan-500 active:text-black rounded-xl h-11 flex items-center justify-center text-xl text-cyan-400 shadow">◀</button>
+            <div></div>
+            <button ontouchstart="setDir('RIGHT'); event.preventDefault();" onclick="setDir('RIGHT')" class="bg-zinc-800/90 border border-zinc-700 active:bg-cyan-500 active:text-black rounded-xl h-11 flex items-center justify-center text-xl text-cyan-400 shadow">▶</button>
+            
+            <div></div>
+            <button ontouchstart="setDir('DOWN'); event.preventDefault();" onclick="setDir('DOWN')" class="bg-zinc-800/90 border border-zinc-700 active:bg-cyan-500 active:text-black rounded-xl h-11 flex items-center justify-center text-xl text-cyan-400 shadow">▼</button>
+            <div></div>
         </div>
     </footer>
 
@@ -303,7 +308,7 @@
         }
 
         function updateTheme(themeClass) {
-            document.body.className = `${themeClass} flex flex-col h-[100vh] h-[100dvh] justify-between items-center py-2 px-3`;
+            document.body.className = `${themeClass} flex flex-col h-[100vh] h-[100dvh] justify-between items-center py-1 px-2`;
             playSound('click');
         }
 
