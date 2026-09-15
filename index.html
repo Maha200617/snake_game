@@ -21,22 +21,6 @@
         .arcade-font {
             font-family: 'Press Start 2P', monospace;
         }
-        /* Mobile Specific Strict Layout Control */
-        @media (max-width: 768px) {
-            body {
-                height: 100vh;
-                height: 100dvh;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                padding: 4px !important;
-            }
-            #gameCanvas {
-                width: 280px !important;
-                height: 280px !important;
-                max-height: 48vh !important;
-            }
-        }
         /* Themes */
         body.theme-neon { background-color: #08080a; color: #ffffff; }
         body.theme-dark { background-color: #121212; color: #e0e0e0; }
@@ -70,7 +54,7 @@
     <!-- MAIN GAME VIEWPORT -->
     <main class="relative flex justify-center items-center my-auto w-full flex-grow">
         <div class="relative rounded-3xl overflow-hidden border-2 border-zinc-800 shadow-2xl bg-black/40 flex justify-center items-center">
-            <canvas id="gameCanvas" width="520" height="520" class="block max-w-full max-h-[58vh] object-contain"></canvas>
+            <canvas id="gameCanvas" width="520" height="520" class="block max-w-full max-h-[46vh] object-contain"></canvas>
             
             <!-- SCREENS / OVERLAYS -->
              
@@ -198,14 +182,11 @@
         </div>
     </main>
 
-    <!-- BOTTOM CONTROL DECK (Foolproof 3x3 D-Pad Grid for All Mobile Devices) -->
-<!-- BOTTOM CONTROL DECK -->
-
- <!-- BOTTOM CONTROL DECK -->
-    <footer id="controlDeck" class="w-full max-w-md pb-2 flex flex-col items-center hidden">
+    <!-- BOTTOM CONTROL DECK (Compact D-Pad aligned right below game box) -->
+    <footer id="controlDeck" class="w-full max-w-md pb-1 flex flex-col items-center hidden">
         <div class="flex flex-col items-center gap-1">
             <button ontouchstart="setDir('UP'); event.preventDefault();" onclick="setDir('UP')" class="bg-zinc-800/90 border border-zinc-700 active:bg-cyan-500 active:text-black rounded-xl w-14 h-9 flex items-center justify-center text-lg text-cyan-400 shadow">▲</button>
-            <div class="flex gap-16">
+            <div class="flex gap-14">
                 <button ontouchstart="setDir('LEFT'); event.preventDefault();" onclick="setDir('LEFT')" class="bg-zinc-800/90 border border-zinc-700 active:bg-cyan-500 active:text-black rounded-xl w-14 h-9 flex items-center justify-center text-lg text-cyan-400 shadow">◀</button>
                 <button ontouchstart="setDir('RIGHT'); event.preventDefault();" onclick="setDir('RIGHT')" class="bg-zinc-800/90 border border-zinc-700 active:bg-cyan-500 active:text-black rounded-xl w-14 h-9 flex items-center justify-center text-lg text-cyan-400 shadow">▶</button>
             </div>
