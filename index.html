@@ -2,30 +2,57 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>Snake Game - Created by Maha</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@600;700&display=swap"
+          rel="stylesheet">
+
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Rajdhani', sans-serif;
             touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
-            margin: 0;
-            padding: 0;
             background-color: #08080a;
             color: #ffffff;
+
+            /* IMPORTANT FIX */
             overflow: hidden;
+        }
+
+        input,
+        select,
+        button {
+            font-family: 'Rajdhani', sans-serif;
         }
 
         .arcade-font {
             font-family: 'Press Start 2P', monospace;
         }
 
-        /* Themes */
+        /* =========================
+           THEMES
+        ========================= */
+
         body.theme-neon {
             background-color: #08080a;
             color: #ffffff;
@@ -46,109 +73,313 @@
             color: #e0e1dd;
         }
 
-        /* =====================================================
-           MOBILE PLAYER SETUP FIX
-           Only the Player Setup screen is adjusted here.
-           Everything else remains unchanged.
-        ===================================================== */
+        /* =========================
+           MAIN APP LAYOUT
+        ========================= */
 
-        @media (max-width: 640px) {
+        #app {
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
 
-            #modeScreen {
-                justify-content: flex-start !important;
-                overflow-y: auto !important;
-                overflow-x: hidden !important;
-                padding: 26px 14px 28px !important;
-                box-sizing: border-box;
-                -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-direction: column;
+
+            padding: 10px 12px;
+
+            overflow: hidden;
+        }
+
+        /* =========================
+           TOP BAR
+        ========================= */
+
+        #topBar {
+            width: 100%;
+            max-width: 645px;
+
+            margin: 0 auto;
+
+            flex-shrink: 0;
+        }
+
+        /* =========================
+           MAIN GAME AREA
+        ========================= */
+
+        #gameArea {
+            width: 100%;
+            flex: 1 1 auto;
+
+            min-height: 0;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 8px 0;
+        }
+
+        #gameWrapper {
+            position: relative;
+
+            width: min(92vw, 520px);
+            height: min(92vw, 520px);
+
+            max-width: 520px;
+            max-height: 100%;
+
+            border-radius: 30px;
+            overflow: hidden;
+
+            border: 2px solid #27272a;
+            background: rgba(0, 0, 0, 0.4);
+
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            flex-shrink: 1;
+        }
+
+        #gameCanvas {
+            display: block;
+
+            width: 100%;
+            height: 100%;
+
+            max-width: 100%;
+            max-height: 100%;
+
+            object-fit: contain;
+        }
+
+        /* =========================
+           OVERLAYS
+        ========================= */
+
+        .game-overlay {
+            position: absolute;
+            inset: 0;
+
+            background: rgba(0, 0, 0, 0.95);
+
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+
+            display: flex;
+            flex-direction: column;
+
+            justify-content: center;
+            align-items: center;
+
+            text-align: center;
+
+            padding: 20px;
+
+            z-index: 20;
+
+            overflow-y: auto;
+        }
+
+        /* Player setup specifically made scroll-safe */
+        #modeScreen {
+            justify-content: center;
+        }
+
+        /* =========================
+           BOTTOM CONTROL DECK
+        ========================= */
+
+        #controlDeck {
+            width: 100%;
+            max-width: 420px;
+
+            flex-shrink: 0;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding-top: 4px;
+
+            /* Enough room for Android navigation area */
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+
+            min-height: 148px;
+        }
+
+        #dpad {
+            width: 180px;
+            height: 132px;
+
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+
+            gap: 8px;
+        }
+
+        .dpad-button {
+            width: 100%;
+            height: 100%;
+
+            background: #27272a;
+
+            border: 1px solid #3f3f46;
+
+            color: #22d3ee;
+
+            border-radius: 16px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-size: 20px;
+
+            box-shadow:
+                0 4px 10px rgba(0, 0, 0, 0.35);
+
+            transition:
+                transform 0.08s ease,
+                background 0.08s ease;
+        }
+
+        .dpad-button:active {
+            background: #06b6d4;
+            color: #000;
+
+            transform: scale(0.94);
+        }
+
+        #upButton {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        #leftButton {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        #downButton {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        #rightButton {
+            grid-column: 3;
+            grid-row: 2;
+        }
+
+        /* =========================
+           SMALL PHONE FIX
+        ========================= */
+
+        @media (max-height: 720px) {
+
+            #app {
+                padding-top: 6px;
+                padding-bottom: 4px;
             }
 
-            #modeScreen h2 {
-                margin-top: 0 !important;
-                margin-bottom: 20px !important;
-                font-size: 13px !important;
-                line-height: 1.5 !important;
-                flex-shrink: 0;
+            #topBar {
+                padding-top: 9px;
+                padding-bottom: 9px;
             }
 
-            #modeScreen > .w-full {
-                width: 100% !important;
-                max-width: 100% !important;
-                gap: 14px !important;
+            #gameArea {
+                padding: 4px 0;
             }
 
-            #modeScreen label {
-                font-size: 11px !important;
-                margin-bottom: 6px !important;
+            #controlDeck {
+                min-height: 122px;
+                padding-bottom: 4px;
             }
 
-            #modeScreen input,
-            #modeScreen select {
-                width: 100% !important;
-                box-sizing: border-box !important;
-                font-size: 14px !important;
-                padding: 12px !important;
-                min-height: 48px;
+            #dpad {
+                width: 150px;
+                height: 108px;
+                gap: 6px;
             }
 
-            #modeScreen > .flex.gap-3 {
-                width: 100%;
-                justify-content: center;
-                gap: 10px !important;
-                margin-top: 18px !important;
-                flex-shrink: 0;
-            }
-
-            #modeScreen > .flex.gap-3 button {
-                font-size: 9px !important;
-                padding: 13px 16px !important;
-                white-space: nowrap;
-            }
-
-            /* Make sure the setup screen never gets visually cut */
-            #modeScreen::-webkit-scrollbar {
-                width: 0;
-                display: none;
+            .dpad-button {
+                border-radius: 14px;
+                font-size: 18px;
             }
         }
 
-        /* Very small phones */
+        /* =========================
+           VERY SMALL HEIGHT
+        ========================= */
+
+        @media (max-height: 620px) {
+
+            #controlDeck {
+                min-height: 105px;
+            }
+
+            #dpad {
+                width: 135px;
+                height: 94px;
+            }
+
+            .dpad-button {
+                font-size: 16px;
+            }
+
+            #gameArea {
+                padding: 2px 0;
+            }
+        }
+
+        /* =========================
+           SMALL WIDTH
+        ========================= */
+
         @media (max-width: 380px) {
 
-            #modeScreen {
-                padding: 20px 12px 24px !important;
+            #app {
+                padding-left: 8px;
+                padding-right: 8px;
             }
 
-            #modeScreen h2 {
-                font-size: 11px !important;
-                margin-bottom: 16px !important;
+            #dpad {
+                width: 150px;
             }
 
-            #modeScreen > .flex.gap-3 button {
-                font-size: 8px !important;
-                padding: 12px 13px !important;
+            .game-overlay {
+                padding: 14px;
             }
         }
+
     </style>
 </head>
 
-<body class="theme-neon flex flex-col h-screen justify-between items-center p-3">
+<body class="theme-neon">
 
-    <!-- =====================================================
+<div id="app">
+
+    <!-- =========================
          TOP STATS BAR
-    ====================================================== -->
+    ========================= -->
 
     <header id="topBar"
-        class="w-full max-w-xl flex justify-between items-center bg-zinc-900/90 backdrop-blur-md border border-zinc-800 px-6 py-3 rounded-2xl shadow-lg hidden">
+            class="flex justify-between items-center bg-zinc-900/90 backdrop-blur-md border border-zinc-800 px-5 py-3 rounded-2xl shadow-lg hidden">
 
-        <div class="flex items-center gap-6">
+        <div class="flex items-center gap-5">
 
             <div>
                 <span class="text-[10px] text-cyan-400 tracking-widest font-bold uppercase block">
                     Score
                 </span>
 
-                <span id="scoreVal" class="arcade-font text-sm">
+                <span id="scoreVal"
+                      class="arcade-font text-sm">
                     0
                 </span>
             </div>
@@ -158,25 +389,25 @@
                     Level
                 </span>
 
-                <span id="levelVal" class="arcade-font text-sm">
+                <span id="levelVal"
+                      class="arcade-font text-sm">
                     1
                 </span>
             </div>
 
         </div>
 
-        <div class="flex items-center gap-6">
+        <div class="flex items-center gap-5">
 
             <div class="text-right">
-
                 <span class="text-[10px] text-yellow-400 tracking-widest font-bold uppercase block">
                     High
                 </span>
 
-                <span id="highScoreVal" class="arcade-font text-sm">
+                <span id="highScoreVal"
+                      class="arcade-font text-sm">
                     0
                 </span>
-
             </div>
 
             <button
@@ -190,30 +421,27 @@
     </header>
 
 
-    <!-- =====================================================
-         MAIN GAME VIEWPORT
-    ====================================================== -->
+    <!-- =========================
+         GAME AREA
+    ========================= -->
 
-    <main class="relative flex justify-center items-center my-auto w-full flex-grow">
+    <main id="gameArea">
 
-        <div
-            class="relative rounded-3xl overflow-hidden border-2 border-zinc-800 shadow-2xl bg-black/40 flex justify-center items-center">
+        <div id="gameWrapper">
 
             <canvas
                 id="gameCanvas"
                 width="520"
-                height="520"
-                class="block max-w-full max-h-[75vh] object-contain">
+                height="520">
             </canvas>
 
 
-            <!-- =================================================
-                 1. HOME SCREEN
-            ================================================== -->
+            <!-- =========================
+                 HOME SCREEN
+            ========================= -->
 
-            <div
-                id="homeScreen"
-                class="absolute inset-0 bg-black/95 backdrop-blur-md flex flex-col justify-center items-center text-center p-6 z-20">
+            <div id="homeScreen"
+                 class="game-overlay">
 
                 <h1
                     class="arcade-font text-cyan-400 text-2xl mb-2 drop-shadow-[0_0_15px_rgba(0,240,255,0.7)]">
@@ -255,23 +483,18 @@
             </div>
 
 
-            <!-- =================================================
-                 2. PLAYER SETUP SCREEN
-                 MOBILE FIX APPLIED HERE
-            ================================================== -->
+            <!-- =========================
+                 PLAYER SETUP
+            ========================= -->
 
-            <div
-                id="modeScreen"
-                class="absolute inset-0 bg-black/95 backdrop-blur-md flex flex-col justify-center items-center text-center p-6 z-20 hidden">
+            <div id="modeScreen"
+                 class="game-overlay hidden">
 
                 <h2 class="arcade-font text-cyan-400 text-sm mb-4">
                     PLAYER SETUP
                 </h2>
 
-
                 <div class="w-full max-w-sm flex flex-col gap-4 text-left">
-
-                    <!-- NAME -->
 
                     <div>
 
@@ -285,13 +508,10 @@
                             value=""
                             autocomplete="off"
                             placeholder="Enter your name"
-                            class="w-full bg-zinc-900 border border-zinc-700 text-white text-sm p-3 rounded-xl outline-none"
-                        />
+                            class="w-full bg-zinc-900 border border-zinc-700 text-white text-sm p-3 rounded-xl outline-none">
 
                     </div>
 
-
-                    <!-- SNAKE STYLE -->
 
                     <div>
 
@@ -323,8 +543,6 @@
 
                     </div>
 
-
-                    <!-- STARTING LEVEL -->
 
                     <div>
 
@@ -363,9 +581,7 @@
                 </div>
 
 
-                <!-- BUTTONS -->
-
-                <div class="flex gap-3 mt-6">
+                <div class="flex gap-3 mt-5">
 
                     <button
                         onclick="switchScreen('homeScreen')"
@@ -384,13 +600,12 @@
             </div>
 
 
-            <!-- =================================================
-                 3. GAME OVER SCREEN
-            ================================================== -->
+            <!-- =========================
+                 GAME OVER
+            ========================= -->
 
-            <div
-                id="gameOverScreen"
-                class="absolute inset-0 bg-black/95 backdrop-blur-md flex flex-col justify-center items-center text-center p-6 z-20 hidden">
+            <div id="gameOverScreen"
+                 class="game-overlay hidden">
 
                 <div class="text-4xl mb-2">
                     💀
@@ -437,13 +652,12 @@
             </div>
 
 
-            <!-- =================================================
-                 4. PAUSE SCREEN
-            ================================================== -->
+            <!-- =========================
+                 PAUSE
+            ========================= -->
 
-            <div
-                id="pauseScreen"
-                class="absolute inset-0 bg-black/90 backdrop-blur-md flex flex-col justify-center items-center text-center p-6 z-20 hidden">
+            <div id="pauseScreen"
+                 class="game-overlay hidden">
 
                 <h2 class="arcade-font text-yellow-400 text-base mb-6">
                     GAME PAUSED
@@ -468,1646 +682,16 @@
             </div>
 
 
-            <!-- =================================================
-                 5. HIGH SCORE SCREEN
-            ================================================== -->
+            <!-- =========================
+                 HIGH SCORE
+            ========================= -->
 
-            <div
-                id="highScoreScreen"
-                class="absolute inset-0 bg-black/95 backdrop-blur-md flex flex-col justify-center items-center text-center p-6 z-20 hidden">
+            <div id="highScoreScreen"
+                 class="game-overlay hidden">
 
                 <h2 class="arcade-font text-yellow-400 text-sm mb-4">
                     LEADERBOARD
                 </h2>
 
                 <div
-                    class="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-xl p-4 mb-4 text-sm max-h-60 overflow-y-auto">
-
-                    <div
-                        class="flex justify-between font-bold text-zinc-400 border-b border-zinc-800 pb-2 mb-2 text-xs">
-
-                        <span>
-                            PLAYER
-                        </span>
-
-                        <span>
-                            SCORE
-                        </span>
-
-                    </div>
-
-                    <div
-                        id="leaderboardList"
-                        class="flex flex-col gap-2 text-xs">
-                    </div>
-
-                </div>
-
-                <button
-                    onclick="switchScreen('homeScreen')"
-                    class="arcade-font bg-zinc-800 text-zinc-300 text-xs py-3.5 px-8 rounded-xl">
-                    BACK
-                </button>
-
-            </div>
-
-
-            <!-- =================================================
-                 6. HOW TO PLAY SCREEN
-            ================================================== -->
-
-            <div
-                id="howToScreen"
-                class="absolute inset-0 bg-black/95 backdrop-blur-md flex flex-col justify-center items-center text-center p-6 z-20 hidden">
-
-                <h2 class="arcade-font text-cyan-400 text-sm mb-3">
-                    HOW TO PLAY
-                </h2>
-
-                <div
-                    class="text-left text-xs text-zinc-300 space-y-2 mb-6 bg-zinc-900 p-4 rounded-xl border border-zinc-800 max-w-sm">
-
-                    <p>
-                        • Use D-Pad or Arrow Keys to steer.
-                    </p>
-
-                    <p>
-                        • Eat food items to score points:
-                    </p>
-
-                    <p class="text-red-400">
-                        - Apple (+10 pts)
-                    </p>
-
-                    <p class="text-pink-400">
-                        - Strawberry (+25 pts)
-                    </p>
-
-                    <p class="text-amber-400">
-                        - Special Food (+50 pts)
-                    </p>
-
-                    <p>
-                        • Avoid walls and blocks as levels rise!
-                    </p>
-
-                </div>
-
-                <button
-                    onclick="switchScreen('homeScreen')"
-                    class="arcade-font bg-zinc-800 text-zinc-300 text-xs py-3.5 px-8 rounded-xl">
-                    BACK
-                </button>
-
-            </div>
-
-
-            <!-- =================================================
-                 7. SETTINGS SCREEN
-            ================================================== -->
-
-            <div
-                id="settingsScreen"
-                class="absolute inset-0 bg-black/95 backdrop-blur-md flex flex-col justify-center items-center text-center p-6 z-20 hidden">
-
-                <h2 class="arcade-font text-cyan-400 text-sm mb-4">
-                    SETTINGS
-                </h2>
-
-                <div class="w-full max-w-sm flex flex-col gap-4 text-left">
-
-                    <div>
-
-                        <label class="text-xs text-zinc-400 font-bold block mb-1.5">
-                            Sound FX:
-                        </label>
-
-                        <select
-                            id="soundSelect"
-                            onchange="updateSoundSetting(this.value)"
-                            class="w-full bg-zinc-900 border border-zinc-700 text-white text-sm p-3 rounded-xl outline-none">
-
-                            <option value="ON">
-                                ON
-                            </option>
-
-                            <option value="OFF">
-                                OFF
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div>
-
-                        <label class="text-xs text-zinc-400 font-bold block mb-1.5">
-                            Theme:
-                        </label>
-
-                        <select
-                            id="themeSelect"
-                            onchange="updateTheme(this.value)"
-                            class="w-full bg-zinc-900 border border-zinc-700 text-white text-sm p-3 rounded-xl outline-none">
-
-                            <option value="theme-neon">
-                                Neon Arcade
-                            </option>
-
-                            <option value="theme-dark">
-                                Dark Minimal
-                            </option>
-
-                            <option value="theme-light">
-                                Light Clean
-                            </option>
-
-                            <option value="theme-retro">
-                                Retro Blue
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-                <button
-                    onclick="switchScreen('homeScreen')"
-                    class="arcade-font bg-zinc-800 text-zinc-300 text-xs py-3.5 px-8 rounded-xl mt-6">
-                    BACK
-                </button>
-
-            </div>
-
-        </div>
-
-    </main>
-
-
-    <!-- =====================================================
-         BOTTOM CONTROL DECK
-    ====================================================== -->
-
-    <footer
-        id="controlDeck"
-        class="w-full max-w-md pb-3 flex flex-col items-center hidden">
-
-        <div class="grid grid-cols-3 gap-2.5 w-48 h-32">
-
-            <div></div>
-
-            <button
-                ontouchstart="setDir('UP'); event.preventDefault();"
-                onclick="setDir('UP')"
-                class="bg-zinc-800 border border-zinc-700 active:bg-cyan-500 active:text-black rounded-xl flex items-center justify-center text-xl text-cyan-400 shadow">
-                ▲
-            </button>
-
-            <div></div>
-
-            <button
-                ontouchstart="setDir('LEFT'); event.preventDefault();"
-                onclick="setDir('LEFT')"
-                class="bg-zinc-800 border border-zinc-700 active:bg-cyan-500 active:text-black rounded-xl flex items-center justify-center text-xl text-cyan-400 shadow">
-                ◀
-            </button>
-
-            <button
-                ontouchstart="setDir('DOWN'); event.preventDefault();"
-                onclick="setDir('DOWN')"
-                class="bg-zinc-800 border border-zinc-700 active:bg-cyan-500 active:text-black rounded-xl flex items-center justify-center text-xl text-cyan-400 shadow">
-                ▼
-            </button>
-
-            <button
-                ontouchstart="setDir('RIGHT'); event.preventDefault();"
-                onclick="setDir('RIGHT')"
-                class="bg-zinc-800 border border-zinc-700 active:bg-cyan-500 active:text-black rounded-xl flex items-center justify-center text-xl text-cyan-400 shadow">
-                ▶
-            </button>
-
-        </div>
-
-    </footer>
-
-
-    <!-- =====================================================
-         GAME ENGINE SCRIPT
-    ====================================================== -->
-
-    <script>
-
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-
-        const gridSize = 20;
-        const tileCount = canvas.width / gridSize;
-
-        let snake = [];
-
-        let food = {
-            x: 5,
-            y: 5,
-            color: '#ff3333',
-            points: 10
-        };
-
-        let obstacles = [];
-
-        let dx = 0;
-        let dy = 0;
-
-        let score = 0;
-        let level = 1;
-
-        let playerName = "Player";
-
-        let highScores =
-            JSON.parse(localStorage.getItem("snakeLeaderboard")) || [];
-
-        let gameInterval = null;
-
-        let gameActive = false;
-        let isPaused = false;
-
-        let speedDelay = 130;
-
-        let soundEnabled = true;
-
-        let snakeStyle = 'classic';
-
-        let audioCtx = null;
-
-
-        /* =====================================================
-           AUDIO
-        ====================================================== */
-
-        function initAudio() {
-
-            if (!audioCtx) {
-
-                audioCtx =
-                    new (window.AudioContext ||
-                        window.webkitAudioContext)();
-
-            }
-
-        }
-
-
-        function playSound(type) {
-
-            if (!soundEnabled) return;
-
-            try {
-
-                initAudio();
-
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-
-                const osc =
-                    audioCtx.createOscillator();
-
-                const gain =
-                    audioCtx.createGain();
-
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-
-                let now =
-                    audioCtx.currentTime;
-
-
-                if (type === 'pop') {
-
-                    osc.type = 'sine';
-
-                    osc.frequency.setValueAtTime(
-                        400,
-                        now
-                    );
-
-                    osc.frequency.exponentialRampToValueAtTime(
-                        800,
-                        now + 0.08
-                    );
-
-                    gain.gain.setValueAtTime(
-                        0.1,
-                        now
-                    );
-
-                    gain.gain.linearRampToValueAtTime(
-                        0.01,
-                        now + 0.08
-                    );
-
-                    osc.start(now);
-
-                    osc.stop(
-                        now + 0.08
-                    );
-
-                }
-
-
-                else if (type === 'boom') {
-
-                    osc.type = 'sawtooth';
-
-                    osc.frequency.setValueAtTime(
-                        150,
-                        now
-                    );
-
-                    osc.frequency.linearRampToValueAtTime(
-                        30,
-                        now + 0.25
-                    );
-
-                    gain.gain.setValueAtTime(
-                        0.2,
-                        now
-                    );
-
-                    gain.gain.linearRampToValueAtTime(
-                        0.01,
-                        now + 0.25
-                    );
-
-                    osc.start(now);
-
-                    osc.stop(
-                        now + 0.25
-                    );
-
-                }
-
-
-                else if (type === 'tada') {
-
-                    osc.type = 'triangle';
-
-                    osc.frequency.setValueAtTime(
-                        300,
-                        now
-                    );
-
-                    osc.frequency.setValueAtTime(
-                        500,
-                        now + 0.1
-                    );
-
-                    osc.frequency.setValueAtTime(
-                        700,
-                        now + 0.2
-                    );
-
-                    gain.gain.setValueAtTime(
-                        0.15,
-                        now
-                    );
-
-                    gain.gain.linearRampToValueAtTime(
-                        0.01,
-                        now + 0.3
-                    );
-
-                    osc.start(now);
-
-                    osc.stop(
-                        now + 0.3
-                    );
-
-                }
-
-
-                else if (type === 'click') {
-
-                    osc.type = 'sine';
-
-                    osc.frequency.setValueAtTime(
-                        600,
-                        now
-                    );
-
-                    gain.gain.setValueAtTime(
-                        0.05,
-                        now
-                    );
-
-                    gain.gain.linearRampToValueAtTime(
-                        0.01,
-                        now + 0.03
-                    );
-
-                    osc.start(now);
-
-                    osc.stop(
-                        now + 0.03
-                    );
-
-                }
-
-            }
-
-            catch (e) {}
-
-        }
-
-
-        /* =====================================================
-           SCREEN SWITCHING
-        ====================================================== */
-
-        function switchScreen(screenId) {
-
-            playSound('click');
-
-            [
-                'homeScreen',
-                'modeScreen',
-                'gameOverScreen',
-                'pauseScreen',
-                'highScoreScreen',
-                'howToScreen',
-                'settingsScreen'
-            ].forEach(id => {
-
-                document
-                    .getElementById(id)
-                    .classList.add('hidden');
-
-            });
-
-
-            if (screenId) {
-
-                document
-                    .getElementById(screenId)
-                    .classList.remove('hidden');
-
-            }
-
-
-            if (screenId === 'highScoreScreen') {
-
-                renderLeaderboard();
-
-            }
-
-        }
-
-
-        /* =====================================================
-           PLAYER SETUP
-        ====================================================== */
-
-        function openPlayerSetup() {
-
-            const inputField =
-                document.getElementById(
-                    'playerNameInput'
-                );
-
-            inputField.value = "";
-
-            switchScreen('modeScreen');
-
-            setTimeout(() => {
-
-                inputField.focus();
-
-            }, 50);
-
-        }
-
-
-        /* =====================================================
-           LEADERBOARD
-        ====================================================== */
-
-        function renderLeaderboard() {
-
-            const list =
-                document.getElementById(
-                    'leaderboardList'
-                );
-
-
-            if (highScores.length === 0) {
-
-                list.innerHTML =
-                    `<div class="text-center text-zinc-500 py-2">
-                        No scores recorded yet!
-                    </div>`;
-
-                return;
-
-            }
-
-
-            list.innerHTML =
-                highScores.map((item, index) => `
-
-                    <div class="flex justify-between items-center text-zinc-300 border-b border-zinc-800/50 pb-1.5">
-
-                        <span class="font-bold text-cyan-400">
-                            ${index + 1}. ${item.name}
-                        </span>
-
-                        <span class="arcade-font text-xs">
-                            ${item.score}
-                        </span>
-
-                    </div>
-
-                `).join('');
-
-        }
-
-
-        /* =====================================================
-           SETTINGS
-        ====================================================== */
-
-        function updateSoundSetting(val) {
-
-            soundEnabled =
-                (val === 'ON');
-
-            playSound('click');
-
-        }
-
-
-        function updateTheme(themeClass) {
-
-            document.body.className =
-                `${themeClass} flex flex-col h-screen justify-between items-center p-3`;
-
-            playSound('click');
-
-        }
-
-
-        /* =====================================================
-           START GAME
-        ====================================================== */
-
-        function initGameAndStart() {
-
-            const inputName =
-                document
-                    .getElementById('playerNameInput')
-                    .value
-                    .trim();
-
-
-            if (inputName === "") {
-
-                alert(
-                    "Please enter your name to play!"
-                );
-
-                return;
-
-            }
-
-
-            playerName = inputName;
-
-
-            snakeStyle =
-                document
-                    .getElementById('snakeStyleSelect')
-                    .value;
-
-
-            level =
-                parseInt(
-                    document
-                        .getElementById('startLevelSelect')
-                        .value
-                );
-
-
-            switchScreen('');
-
-
-            document
-                .getElementById('topBar')
-                .classList
-                .remove('hidden');
-
-
-            document
-                .getElementById('controlDeck')
-                .classList
-                .remove('hidden');
-
-
-            startGame();
-
-        }
-
-
-        /* =====================================================
-           START / RESET GAME
-        ====================================================== */
-
-        function startGame() {
-
-            if (gameInterval) {
-                clearInterval(gameInterval);
-            }
-
-
-            let mid =
-                Math.floor(tileCount / 2);
-
-
-            snake = [
-
-                {
-                    x: mid,
-                    y: mid
-                },
-
-                {
-                    x: mid - 1,
-                    y: mid
-                },
-
-                {
-                    x: mid - 2,
-                    y: mid
-                }
-
-            ];
-
-
-            dx = 0;
-            dy = 0;
-
-            score = 0;
-
-            isPaused = false;
-
-            gameActive = true;
-
-
-            speedDelay =
-                Math.max(
-                    60,
-                    140 - (level * 16)
-                );
-
-
-            document
-                .getElementById('scoreVal')
-                .innerText = score;
-
-
-            document
-                .getElementById('levelVal')
-                .innerText = level;
-
-
-            let playerBest =
-                highScores.find(
-                    p =>
-                        p.name.toLowerCase() ===
-                        playerName.toLowerCase()
-                );
-
-
-            document
-                .getElementById('highScoreVal')
-                .innerText =
-                    playerBest
-                        ? playerBest.score
-                        : 0;
-
-
-            generateObstacles();
-
-            spawnFood();
-
-            renderGame();
-
-
-            gameInterval =
-                setInterval(
-                    mainLoop,
-                    speedDelay
-                );
-
-        }
-
-
-        /* =====================================================
-           OBSTACLES
-        ====================================================== */
-
-        function generateObstacles() {
-
-            obstacles = [];
-
-
-            if (level >= 3) {
-
-                const count =
-                    (level - 2) * 2;
-
-
-                for (
-                    let i = 0;
-                    i < count;
-                    i++
-                ) {
-
-                    obstacles.push({
-                        x: 5 + i * 4,
-                        y: 5
-                    });
-
-
-                    obstacles.push({
-                        x: tileCount - 6 - i * 4,
-                        y: tileCount - 6
-                    });
-
-                }
-
-            }
-
-        }
-
-
-        /* =====================================================
-           MAIN GAME LOOP
-        ====================================================== */
-
-        function mainLoop() {
-
-            if (!gameActive || isPaused)
-                return;
-
-
-            if (dx === 0 && dy === 0) {
-
-                renderGame();
-
-                return;
-
-            }
-
-
-            const head = {
-
-                x: snake[0].x + dx,
-
-                y: snake[0].y + dy
-
-            };
-
-
-            snake.unshift(head);
-
-
-            if (
-                head.x === food.x &&
-                head.y === food.y
-            ) {
-
-                playSound('pop');
-
-                score += food.points;
-
-
-                document
-                    .getElementById('scoreVal')
-                    .innerText = score;
-
-
-                let playerBest =
-                    highScores.find(
-                        p =>
-                            p.name.toLowerCase() ===
-                            playerName.toLowerCase()
-                    );
-
-
-                let currentBest =
-                    playerBest
-                        ? playerBest.score
-                        : 0;
-
-
-                if (score > currentBest) {
-
-                    document
-                        .getElementById(
-                            'highScoreVal'
-                        )
-                        .innerText = score;
-
-                }
-
-
-                let calculatedLevel =
-                    Math.min(
-                        5,
-                        Math.floor(score / 50) + 1
-                    );
-
-
-                if (calculatedLevel > level) {
-
-                    level =
-                        calculatedLevel;
-
-
-                    document
-                        .getElementById('levelVal')
-                        .innerText = level;
-
-
-                    generateObstacles();
-
-
-                    speedDelay =
-                        Math.max(
-                            50,
-                            140 - (level * 16)
-                        );
-
-
-                    clearInterval(
-                        gameInterval
-                    );
-
-
-                    gameInterval =
-                        setInterval(
-                            mainLoop,
-                            speedDelay
-                        );
-
-                }
-
-
-                spawnFood();
-
-            }
-
-            else {
-
-                snake.pop();
-
-            }
-
-
-            /* WALL COLLISION */
-
-            if (
-                head.x < 0 ||
-                head.x >= tileCount ||
-                head.y < 0 ||
-                head.y >= tileCount
-            ) {
-
-                triggerGameOver();
-
-                return;
-
-            }
-
-
-            /* SELF COLLISION */
-
-            for (
-                let i = 1;
-                i < snake.length;
-                i++
-            ) {
-
-                if (
-                    head.x === snake[i].x &&
-                    head.y === snake[i].y
-                ) {
-
-                    triggerGameOver();
-
-                    return;
-
-                }
-
-            }
-
-
-            /* OBSTACLE COLLISION */
-
-            if (
-                obstacles.some(
-                    obs =>
-                        obs.x === head.x &&
-                        obs.y === head.y
-                )
-            ) {
-
-                triggerGameOver();
-
-                return;
-
-            }
-
-
-            renderGame();
-
-        }
-
-
-        /* =====================================================
-           RENDER GAME
-        ====================================================== */
-
-        function renderGame() {
-
-            ctx.clearRect(
-                0,
-                0,
-                canvas.width,
-                canvas.height
-            );
-
-
-            /* OBSTACLES */
-
-            ctx.fillStyle = '#52525b';
-
-
-            obstacles.forEach(obs => {
-
-                ctx.fillRect(
-                    obs.x * gridSize,
-                    obs.y * gridSize,
-                    gridSize - 2,
-                    gridSize - 2
-                );
-
-            });
-
-
-            /* FOOD */
-
-            ctx.fillStyle =
-                food.color;
-
-            ctx.shadowColor =
-                food.color;
-
-            ctx.shadowBlur = 12;
-
-
-            ctx.beginPath();
-
-
-            ctx.arc(
-                (food.x * gridSize) +
-                    gridSize / 2,
-
-                (food.y * gridSize) +
-                    gridSize / 2,
-
-                gridSize / 2 - 2,
-
-                0,
-
-                Math.PI * 2
-            );
-
-
-            ctx.fill();
-
-            ctx.shadowBlur = 0;
-
-
-            /* SNAKE */
-
-            snake.forEach(
-                (part, index) => {
-
-                    if (
-                        snakeStyle ===
-                        'classic'
-                    ) {
-
-                        ctx.fillStyle =
-                            index === 0
-                                ? '#10b981'
-                                : '#059669';
-
-                    }
-
-
-                    else if (
-                        snakeStyle ===
-                        'colorful'
-                    ) {
-
-                        const colors = [
-
-                            '#f43f5e',
-                            '#fb923c',
-                            '#facc15',
-                            '#4ade80',
-                            '#38bdf8',
-                            '#c084fc'
-
-                        ];
-
-                        ctx.fillStyle =
-                            colors[
-                                index %
-                                colors.length
-                            ];
-
-                    }
-
-
-                    else if (
-                        snakeStyle ===
-                        'neon'
-                    ) {
-
-                        ctx.fillStyle =
-                            index === 0
-                                ? '#00f0ff'
-                                : '#ff007f';
-
-                        ctx.shadowColor =
-                            ctx.fillStyle;
-
-                        ctx.shadowBlur = 8;
-
-                    }
-
-
-                    else if (
-                        snakeStyle ===
-                        'eyes'
-                    ) {
-
-                        ctx.fillStyle =
-                            index === 0
-                                ? '#22c55e'
-                                : '#15803d';
-
-                    }
-
-
-                    ctx.fillRect(
-
-                        part.x * gridSize,
-
-                        part.y * gridSize,
-
-                        gridSize - 2,
-
-                        gridSize - 2
-
-                    );
-
-
-                    /* EYES */
-
-                    if (
-                        index === 0 &&
-                        snakeStyle ===
-                        'eyes'
-                    ) {
-
-                        ctx.fillStyle =
-                            '#000';
-
-                        ctx.fillRect(
-
-                            part.x *
-                                gridSize + 5,
-
-                            part.y *
-                                gridSize + 5,
-
-                            3,
-
-                            3
-
-                        );
-
-
-                        ctx.fillRect(
-
-                            part.x *
-                                gridSize + 14,
-
-                            part.y *
-                                gridSize + 14,
-
-                            3,
-
-                            3
-
-                        );
-
-                    }
-
-                }
-            );
-
-
-            ctx.shadowBlur = 0;
-
-        }
-
-
-        /* =====================================================
-           FOOD SPAWN
-        ====================================================== */
-
-        function spawnFood() {
-
-            const types = [
-
-                {
-                    color: '#ff3333',
-                    points: 10
-                },
-
-                {
-                    color: '#ec4899',
-                    points: 25
-                },
-
-                {
-                    color: '#fbbf24',
-                    points: 50
-                }
-
-            ];
-
-
-            const chosen =
-                types[
-                    Math.floor(
-                        Math.random() *
-                        types.length
-                    )
-                ];
-
-
-            food.color =
-                chosen.color;
-
-            food.points =
-                chosen.points;
-
-
-            food.x =
-                Math.floor(
-                    Math.random() *
-                    tileCount
-                );
-
-
-            food.y =
-                Math.floor(
-                    Math.random() *
-                    tileCount
-                );
-
-
-            let conflict =
-
-                snake.some(
-                    p =>
-                        p.x === food.x &&
-                        p.y === food.y
-                )
-
-                ||
-
-                obstacles.some(
-                    o =>
-                        o.x === food.x &&
-                        o.y === food.y
-                );
-
-
-            if (conflict) {
-
-                spawnFood();
-
-            }
-
-        }
-
-
-        /* =====================================================
-           SAVE SCORE
-        ====================================================== */
-
-        function saveScoreAndLeaderboard() {
-
-            let existingIndex =
-                highScores.findIndex(
-                    p =>
-                        p.name.toLowerCase() ===
-                        playerName.toLowerCase()
-                );
-
-
-            if (existingIndex !== -1) {
-
-                if (
-                    score >
-                    highScores[
-                        existingIndex
-                    ].score
-                ) {
-
-                    highScores[
-                        existingIndex
-                    ].score = score;
-
-                }
-
-            }
-
-            else {
-
-                highScores.push({
-
-                    name: playerName,
-
-                    score: score
-
-                });
-
-            }
-
-
-            highScores.sort(
-                (a, b) =>
-                    b.score - a.score
-            );
-
-
-            highScores =
-                highScores.slice(0, 10);
-
-
-            localStorage.setItem(
-                "snakeLeaderboard",
-                JSON.stringify(highScores)
-            );
-
-        }
-
-
-        /* =====================================================
-           GAME OVER
-        ====================================================== */
-
-        function triggerGameOver() {
-
-            playSound('boom');
-
-            gameActive = false;
-
-
-            if (gameInterval) {
-
-                clearInterval(
-                    gameInterval
-                );
-
-            }
-
-
-            saveScoreAndLeaderboard();
-
-
-            let playerBest =
-                highScores.find(
-                    p =>
-                        p.name.toLowerCase() ===
-                        playerName.toLowerCase()
-                );
-
-
-            document
-                .getElementById(
-                    'playerResultText'
-                )
-                .innerText =
-                    `Player: ${playerName}`;
-
-
-            document
-                .getElementById(
-                    'finalScoreText'
-                )
-                .innerText =
-                    `Your Score: ${score}`;
-
-
-            document
-                .getElementById(
-                    'finalHighScoreText'
-                )
-                .innerText =
-                    `Best Score: ${
-                        playerBest
-                            ? playerBest.score
-                            : score
-                    }`;
-
-
-            switchScreen(
-                'gameOverScreen'
-            );
-
-
-            document
-                .getElementById('topBar')
-                .classList
-                .add('hidden');
-
-
-            document
-                .getElementById('controlDeck')
-                .classList
-                .add('hidden');
-
-        }
-
-
-        /* =====================================================
-           RESTART
-        ====================================================== */
-
-        function restartGame() {
-
-            document
-                .getElementById('topBar')
-                .classList
-                .remove('hidden');
-
-
-            document
-                .getElementById('controlDeck')
-                .classList
-                .remove('hidden');
-
-
-            switchScreen('');
-
-            startGame();
-
-        }
-
-
-        /* =====================================================
-           HOME
-        ====================================================== */
-
-        function returnToHome() {
-
-            gameActive = false;
-
-
-            if (gameInterval) {
-
-                clearInterval(
-                    gameInterval
-                );
-
-            }
-
-
-            document
-                .getElementById('topBar')
-                .classList
-                .add('hidden');
-
-
-            document
-                .getElementById('controlDeck')
-                .classList
-                .add('hidden');
-
-
-            switchScreen(
-                'homeScreen'
-            );
-
-        }
-
-
-        /* =====================================================
-           PAUSE
-        ====================================================== */
-
-        function togglePause() {
-
-            if (!gameActive)
-                return;
-
-
-            isPaused =
-                !isPaused;
-
-
-            if (isPaused) {
-
-                switchScreen(
-                    'pauseScreen'
-                );
-
-
-                document
-                    .getElementById('topBar')
-                    .classList
-                    .remove('hidden');
-
-
-                document
-                    .getElementById('controlDeck')
-                    .classList
-                    .remove('hidden');
-
-            }
-
-            else {
-
-                switchScreen('');
-
-
-                document
-                    .getElementById('topBar')
-                    .classList
-                    .remove('hidden');
-
-
-                document
-                    .getElementById('controlDeck')
-                    .classList
-                    .remove('hidden');
-
-            }
-
-        }
-
-
-        /* =====================================================
-           D-PAD
-        ====================================================== */
-
-        function setDir(direction) {
-
-            if (
-                !gameActive ||
-                isPaused
-            )
-                return;
-
-
-            if (
-                direction === 'UP' &&
-                dy === 0
-            ) {
-
-                dx = 0;
-                dy = -1;
-
-            }
-
-
-            if (
-                direction === 'DOWN' &&
-                dy === 0
-            ) {
-
-                dx = 0;
-                dy = 1;
-
-            }
-
-
-            if (
-                direction === 'LEFT' &&
-                dx === 0
-            ) {
-
-                dx = -1;
-                dy = 0;
-
-            }
-
-
-            if (
-                direction === 'RIGHT' &&
-                dx === 0
-            ) {
-
-                dx = 1;
-                dy = 0;
-
-            }
-
-        }
-
-
-        /* =====================================================
-           KEYBOARD CONTROLS
-        ====================================================== */
-
-        window.addEventListener(
-            "keydown",
-            e => {
-
-                switch (e.key) {
-
-                    case "ArrowUp":
-
-                        setDir('UP');
-
-                        e.preventDefault();
-
-                        break;
-
-
-                    case "ArrowDown":
-
-                        setDir('DOWN');
-
-                        e.preventDefault();
-
-                        break;
-
-
-                    case "ArrowLeft":
-
-                        setDir('LEFT');
-
-                        e.preventDefault();
-
-                        break;
-
-
-                    case "ArrowRight":
-
-                        setDir('RIGHT');
-
-                        e.preventDefault();
-
-                        break;
-
-
-                    case "r":
-                    case "R":
-
-                        if (
-                            !gameActive &&
-                            !document
-                                .getElementById(
-                                    'gameOverScreen'
-                                )
-                                .classList
-                                .contains(
-                                    'hidden'
-                                )
-                        ) {
-
-                            restartGame();
-
-                        }
-
-                        break;
-
-                }
-
-            }
-        );
-
-    </script>
-
-</body>
-</html>
+                    class="w-full
