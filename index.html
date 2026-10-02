@@ -34,12 +34,11 @@
         body.theme-light { background-color: #f0f4f8; color: #1e293b; }
         body.theme-retro { background-color: #1b263b; color: #e0e1dd; }
 
-        /* Overlays Scrolling support */
-        #modeScreen, #homeScreen, #highScoreScreen, #howToScreen, #settingsScreen, #gameOverScreen, #pauseScreen {
+        #modeScreen, #homeScreen, #gameOverScreen, #pauseScreen {
             overflow-y: auto;
             scrollbar-width: none;
         }
-        #modeScreen::-webkit-scrollbar, #homeScreen::-webkit-scrollbar, #highScoreScreen::-webkit-scrollbar, #howToScreen::-webkit-scrollbar, #settingsScreen::-webkit-scrollbar {
+        #modeScreen::-webkit-scrollbar, #homeScreen::-webkit-scrollbar, #gameOverScreen::-webkit-scrollbar {
             display: none;
         }
     </style>
@@ -48,17 +47,13 @@
 
     <!-- TOP STATS BAR -->
     <header id="topBar" class="w-full max-w-md flex justify-between items-center bg-zinc-900/90 backdrop-blur-md border border-zinc-800 px-4 py-2.5 rounded-2xl shadow-lg hidden">
-        <div class="flex items-center gap-5">
+        <div class="flex items-center gap-4">
             <div>
                 <span class="text-[9px] text-cyan-400 tracking-widest font-bold uppercase block">Score</span>
                 <span id="scoreVal" class="arcade-font text-xs">0</span>
             </div>
-            <div>
-                <span class="text-[9px] text-pink-500 tracking-widest font-bold uppercase block">Level</span>
-                <span id="levelVal" class="arcade-font text-xs">1</span>
-            </div>
         </div>
-        <div class="flex items-center gap-5">
+        <div class="flex items-center gap-4">
             <div class="text-right">
                 <span class="text-[9px] text-yellow-400 tracking-widest font-bold uppercase block">High</span>
                 <span id="highScoreVal" class="arcade-font text-xs">0</span>
@@ -69,32 +64,30 @@
 
     <!-- MAIN GAME VIEWPORT -->
     <main id="gameTouchArea" class="relative flex justify-center items-center my-auto w-full flex-grow">
-        <div class="relative rounded-3xl overflow-hidden border-2 border-zinc-800 shadow-2xl bg-black/40 flex justify-center items-center">
-            <canvas id="gameCanvas" width="520" height="520" class="block max-w-full max-h-[72vh] object-contain"></canvas>
+        <!-- CLEAN GAME CONTAINER -->
+        <div id="gameBorderContainer" class="relative rounded-2xl overflow-hidden border-4 border-zinc-700 shadow-2xl bg-black/60 flex justify-center items-center transition-all duration-300">
+            <canvas id="gameCanvas" width="520" height="520" class="block max-w-full max-h-[70vh] object-contain"></canvas>
             
             <!-- 1. HOME SCREEN -->
             <div id="homeScreen" class="absolute inset-0 bg-black/95 backdrop-blur-md flex flex-col justify-center items-center text-center p-6 z-20">
                 <h1 class="arcade-font text-cyan-400 text-xl mb-2 drop-shadow-[0_0_15px_rgba(0,240,255,0.7)]">SNAKE GAME</h1>
-                <p class="text-xs text-pink-400 font-bold mb-6 tracking-widest">"created by Maha"</p>
-                <div class="flex flex-col gap-3.5 w-56">
-                    <button onclick="openPlayerSetup()" class="arcade-font bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold py-3.5 px-6 rounded-xl active:scale-95 transition-all shadow-lg">START GAME</button>
-                    <button onclick="switchScreen('highScoreScreen')" class="arcade-font bg-zinc-800 hover:bg-zinc-700 text-cyan-400 text-xs font-bold py-3.5 px-6 rounded-xl active:scale-95 transition-all border border-zinc-700">HIGH SCORE</button>
-                    <button onclick="switchScreen('howToScreen')" class="arcade-font bg-zinc-800 hover:bg-zinc-700 text-cyan-400 text-xs font-bold py-3.5 px-6 rounded-xl active:scale-95 transition-all border border-zinc-700">HOW TO PLAY</button>
-                    <button onclick="switchScreen('settingsScreen')" class="arcade-font bg-zinc-800 hover:bg-zinc-700 text-cyan-400 text-xs font-bold py-3.5 px-6 rounded-xl active:scale-95 transition-all border border-zinc-700">SETTINGS</button>
+                <p class="text-xs text-pink-400 font-bold mb-8 tracking-widest">"created by Maha"</p>
+                <div class="w-56">
+                    <button onclick="openPlayerSetup()" class="arcade-font w-full bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold py-4 px-6 rounded-xl active:scale-95 transition-all shadow-lg">START</button>
                 </div>
             </div>
 
-            <!-- 2. PLAYER SETUP -->
+            <!-- 2. PLAYER SETUP & SETTINGS SCREEN -->
             <div id="modeScreen" class="absolute inset-0 bg-black/95 backdrop-blur-md flex flex-col justify-center items-center text-center p-6 z-20 hidden">
-                <h2 class="arcade-font text-cyan-400 text-xs mb-4">PLAYER SETUP</h2>
-                <div class="w-full max-w-xs flex flex-col gap-3.5 text-left">
+                <h2 class="arcade-font text-cyan-400 text-xs mb-3">PLAYER SETUP</h2>
+                <div class="w-full max-w-xs flex flex-col gap-2.5 text-left">
                     <div>
-                        <label class="text-[10px] text-zinc-400 font-bold block mb-1">Your Name:</label>
-                        <input type="text" id="playerNameInput" value="" autocomplete="off" placeholder="Enter your name" class="w-full bg-zinc-900 border border-zinc-700 text-white text-xs p-3 rounded-xl outline-none" />
+                        <label class="text-[10px] text-zinc-400 font-bold block mb-1">Enter Your Name:</label>
+                        <input type="text" id="playerNameInput" value="" autocomplete="off" placeholder="Your Name" class="w-full bg-zinc-900 border border-zinc-700 text-white text-xs p-2 rounded-xl outline-none" />
                     </div>
                     <div>
                         <label class="text-[10px] text-zinc-400 font-bold block mb-1">Snake Style:</label>
-                        <select id="snakeStyleSelect" class="w-full bg-zinc-900 border border-zinc-700 text-white text-xs p-3 rounded-xl outline-none">
+                        <select id="snakeStyleSelect" class="w-full bg-zinc-900 border border-zinc-700 text-white text-xs p-2 rounded-xl outline-none">
                             <option value="classic">Classic Green</option>
                             <option value="colorful">Colorful Gradient</option>
                             <option value="eyes">Snake with Eyes</option>
@@ -102,19 +95,32 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-[10px] text-zinc-400 font-bold block mb-1">Starting Level (1-5):</label>
-                        <select id="startLevelSelect" class="w-full bg-zinc-900 border border-zinc-700 text-white text-xs p-3 rounded-xl outline-none">
-                            <option value="1">Level 1 - Slow</option>
-                            <option value="2">Level 2 - Normal</option>
-                            <option value="3">Level 3 - Fast</option>
-                            <option value="4">Level 4 - Very Fast</option>
-                            <option value="5">Level 5 - Insane</option>
+                        <label class="text-[10px] text-zinc-400 font-bold block mb-1">Sound FX:</label>
+                        <select id="soundToggle" class="w-full bg-zinc-900 border border-zinc-700 text-white text-xs p-2 rounded-xl outline-none">
+                            <option value="on">Sound ON</option>
+                            <option value="off">Sound OFF</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-zinc-400 font-bold block mb-1">Theme:</label>
+                        <select id="themeSelect" onchange="updateTheme(this.value)" class="w-full bg-zinc-900 border border-zinc-700 text-white text-xs p-2 rounded-xl outline-none">
+                            <option value="theme-neon">Neon Arcade</option>
+                            <option value="theme-dark">Dark Minimal</option>
+                            <option value="theme-light">Light Clean</option>
+                            <option value="theme-retro">Retro Blue</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-zinc-400 font-bold block mb-1">Background Music:</label>
+                        <select id="musicSelect" class="w-full bg-zinc-900 border border-zinc-700 text-white text-xs p-2 rounded-xl outline-none">
+                            <option value="suzume">Suzume</option>
+                            <option value="off">Muted (Off)</option>
                         </select>
                     </div>
                 </div>
-                <div class="flex gap-3 mt-5">
+                <div class="flex gap-3 mt-4">
                     <button onclick="switchScreen('homeScreen')" class="arcade-font bg-zinc-800 text-zinc-300 text-xs py-3 px-6 rounded-xl">BACK</button>
-                    <button onclick="initGameAndStart()" class="arcade-font bg-cyan-500 text-black text-xs font-bold py-3 px-8 rounded-xl shadow-lg">PLAY NOW</button>
+                    <button onclick="initGameAndStart()" class="arcade-font bg-cyan-500 text-black text-xs font-bold py-3 px-8 rounded-xl shadow-lg">START GAME</button>
                 </div>
             </div>
 
@@ -124,7 +130,13 @@
                 <h2 class="arcade-font text-red-500 text-sm mb-2">GAME OVER</h2>
                 <p id="playerResultText" class="text-cyan-400 text-xs font-bold mb-1">Player: Maha</p>
                 <p id="finalScoreText" class="text-zinc-300 text-xs mb-1">Your Score: 0</p>
-                <p id="finalHighScoreText" class="text-yellow-400 text-xs mb-5">Best Score: 0</p>
+                <p id="finalHighScoreText" class="text-yellow-400 text-xs mb-3">High Score: 0</p>
+                <div class="w-full max-w-xs bg-zinc-900 border border-zinc-800 rounded-xl p-3 mb-3 text-xs max-h-36 overflow-y-auto">
+                    <div class="flex justify-between font-bold text-zinc-400 border-b border-zinc-800 pb-1 mb-1">
+                        <span>TOP PLAYERS</span><span>SCORE</span>
+                    </div>
+                    <div id="leaderboardList" class="flex flex-col gap-1 text-xs"></div>
+                </div>
                 <div class="flex gap-3">
                     <button onclick="restartGame()" class="arcade-font bg-cyan-500 text-black text-xs font-bold py-3 px-6 rounded-xl shadow-lg">RESTART</button>
                     <button onclick="returnToHome()" class="arcade-font bg-zinc-800 text-zinc-300 text-xs py-3 px-6 rounded-xl">HOME</button>
@@ -140,56 +152,6 @@
                 </div>
             </div>
 
-            <!-- 5. HIGH SCORE SCREEN -->
-            <div id="highScoreScreen" class="absolute inset-0 bg-black/95 backdrop-blur-md flex flex-col justify-center items-center text-center p-6 z-20 hidden">
-                <h2 class="arcade-font text-yellow-400 text-xs mb-3">LEADERBOARD</h2>
-                <div class="w-full max-w-xs bg-zinc-900 border border-zinc-800 rounded-xl p-3 mb-3 text-xs max-h-44 overflow-y-auto">
-                    <div class="flex justify-between font-bold text-zinc-400 border-b border-zinc-800 pb-2 mb-2">
-                        <span>PLAYER</span><span>SCORE</span>
-                    </div>
-                    <div id="leaderboardList" class="flex flex-col gap-1.5 text-xs"></div>
-                </div>
-                <button onclick="switchScreen('homeScreen')" class="arcade-font bg-zinc-800 text-zinc-300 text-xs py-3 px-8 rounded-xl">BACK</button>
-            </div>
-
-            <!-- 6. HOW TO PLAY SCREEN -->
-            <div id="howToScreen" class="absolute inset-0 bg-black/95 backdrop-blur-md flex flex-col justify-center items-center text-center p-6 z-20 hidden">
-                <h2 class="arcade-font text-cyan-400 text-xs mb-3">HOW TO PLAY</h2>
-                <div class="text-left text-xs text-zinc-300 space-y-2 mb-5 bg-zinc-900 p-4 rounded-xl border border-zinc-800 max-w-xs">
-                    <p>• Mobile: Swipe anywhere to steer.</p>
-                    <p>• Laptop: Use Keyboard Arrow Keys.</p>
-                    <p>• Eat food items to score points:</p>
-                    <p class="text-red-400">  - Apple (+10 pts)</p>
-                    <p class="text-pink-400">  - Strawberry (+25 pts)</p>
-                    <p class="text-amber-400">  - Special Food (+50 pts)</p>
-                </div>
-                <button onclick="switchScreen('homeScreen')" class="arcade-font bg-zinc-800 text-zinc-300 text-xs py-3 px-8 rounded-xl">BACK</button>
-            </div>
-
-            <!-- 7. SETTINGS SCREEN -->
-            <div id="settingsScreen" class="absolute inset-0 bg-black/95 backdrop-blur-md flex flex-col justify-center items-center text-center p-6 z-20 hidden">
-                <h2 class="arcade-font text-cyan-400 text-xs mb-4">SETTINGS</h2>
-                <div class="w-full max-w-xs flex flex-col gap-3 text-left">
-                    <div>
-                        <label class="text-[10px] text-zinc-400 font-bold block mb-1">Sound FX:</label>
-                        <select id="soundSelect" onchange="updateSoundSetting(this.value)" class="w-full bg-zinc-900 border border-zinc-700 text-white text-xs p-3 rounded-xl outline-none">
-                            <option value="ON">ON</option>
-                            <option value="OFF">OFF</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[10px] text-zinc-400 font-bold block mb-1">Theme:</label>
-                        <select id="themeSelect" onchange="updateTheme(this.value)" class="w-full bg-zinc-900 border border-zinc-700 text-white text-xs p-3 rounded-xl outline-none">
-                            <option value="theme-neon">Neon Arcade</option>
-                            <option value="theme-dark">Dark Minimal</option>
-                            <option value="theme-light">Light Clean</option>
-                            <option value="theme-retro">Retro Blue</option>
-                        </select>
-                    </div>
-                </div>
-                <button onclick="switchScreen('homeScreen')" class="arcade-font bg-zinc-800 text-zinc-300 text-xs py-3 px-8 rounded-xl mt-5">BACK</button>
-            </div>
-
         </div>
     </main>
 
@@ -203,75 +165,69 @@
 
         let snake = [];
         let food = { x: 5, y: 5, color: '#ff3333', points: 10 };
-        let obstacles = [];
         let dx = 0;
         let dy = 0;
         let score = 0;
-        let level = 1;
         let playerName = "Player";
         let highScores = JSON.parse(localStorage.getItem("snakeLeaderboard")) || [];
         let gameInterval = null;
         let gameActive = false;
         let isPaused = false;
-        let speedDelay = 130;
-        let soundEnabled = true;
+        let speedDelay = 120;
         let snakeStyle = 'classic';
+        let alertShown = false;
 
-        let audioCtx = null;
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-        }
+        let bgAudio = new Audio('suzume.mp3');
+        bgAudio.loop = true;
 
         function playSound(type) {
-            if (!soundEnabled) return;
+            if (document.getElementById('soundToggle').value === 'off') return;
             try {
-                initAudio();
-                if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-
                 let now = audioCtx.currentTime;
                 if (type === 'pop') {
-                    osc.type = 'sine';
                     osc.frequency.setValueAtTime(400, now);
                     osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
                     gain.gain.setValueAtTime(0.1, now);
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
-                    osc.start(now);
-                    osc.stop(now + 0.08);
                 } else if (type === 'boom') {
-                    osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(150, now);
                     osc.frequency.linearRampToValueAtTime(30, now + 0.25);
                     gain.gain.setValueAtTime(0.2, now);
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
-                    osc.start(now);
-                    osc.stop(now + 0.25);
-                } else if (type === 'click') {
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(600, now);
-                    gain.gain.setValueAtTime(0.05, now);
-                    gain.gain.linearRampToValueAtTime(0.01, now + 0.03);
-                    osc.start(now);
-                    osc.stop(now + 0.03);
                 }
+                osc.start(now);
+                osc.stop(now + 0.25);
             } catch (e) {}
         }
 
+        function startMusic() {
+            stopMusic();
+            const selectedSong = document.getElementById('musicSelect').value;
+            if (selectedSong === 'off') return;
+
+            bgAudio.src = 'suzume.mp3';
+            bgAudio.currentTime = 0;
+            bgAudio.play().catch(err => {
+                console.log("Audio play blocked by browser:", err);
+            });
+        }
+
+        function stopMusic() {
+            bgAudio.pause();
+            bgAudio.currentTime = 0;
+        }
+
         function switchScreen(screenId) {
-            playSound('click');
-            ['homeScreen', 'modeScreen', 'gameOverScreen', 'pauseScreen', 'highScoreScreen', 'howToScreen', 'settingsScreen'].forEach(id => {
+            ['homeScreen', 'modeScreen', 'gameOverScreen', 'pauseScreen'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
             });
             if (screenId) {
                 document.getElementById(screenId).classList.remove('hidden');
-            }
-            if (screenId === 'highScoreScreen') {
-                renderLeaderboard();
             }
         }
 
@@ -285,37 +241,32 @@
         function renderLeaderboard() {
             const list = document.getElementById('leaderboardList');
             if (highScores.length === 0) {
-                list.innerHTML = `<div class="text-center text-zinc-500 py-2">No scores recorded yet!</div>`;
+                list.innerHTML = `<div class="text-center text-zinc-500 py-1">No scores recorded yet!</div>`;
                 return;
             }
             list.innerHTML = highScores.map((item, index) => `
-                <div class="flex justify-between items-center text-zinc-300 border-b border-zinc-800/50 pb-1">
+                <div class="flex justify-between items-center text-zinc-300 border-b border-zinc-800/50 pb-0.5">
                     <span class="font-bold text-cyan-400">${index + 1}. ${item.name}</span>
                     <span class="arcade-font text-xs">${item.score}</span>
                 </div>
             `).join('');
         }
 
-        function updateSoundSetting(val) {
-            soundEnabled = (val === 'ON');
-            playSound('click');
-        }
-
         function updateTheme(themeClass) {
             document.body.className = `${themeClass}`;
-            playSound('click');
         }
 
         function initGameAndStart() {
             const inputName = document.getElementById('playerNameInput').value.trim();
             if (inputName === "") {
-                alert("Please enter your name to play!");
+                alert("Please enter your name!");
                 return;
             }
             playerName = inputName;
             snakeStyle = document.getElementById('snakeStyleSelect').value;
-            level = parseInt(document.getElementById('startLevelSelect').value);
             
+            startMusic();
+
             switchScreen('');
             document.getElementById('topBar').classList.remove('hidden');
             
@@ -335,30 +286,21 @@
             score = 0;
             isPaused = false;
             gameActive = true;
-            speedDelay = Math.max(60, 140 - (level * 16));
+            alertShown = false;
+
+            // Reset container border to normal grey color
+            const container = document.getElementById('gameBorderContainer');
+            container.className = "relative rounded-2xl overflow-hidden border-4 border-zinc-700 shadow-2xl bg-black/60 flex justify-center items-center transition-all duration-300";
             
             document.getElementById('scoreVal').innerText = score;
-            document.getElementById('levelVal').innerText = level;
             
             let playerBest = highScores.find(p => p.name.toLowerCase() === playerName.toLowerCase());
             document.getElementById('highScoreVal').innerText = playerBest ? playerBest.score : 0;
             
-            generateObstacles();
             spawnFood();
             renderGame();
             
             gameInterval = setInterval(mainLoop, speedDelay);
-        }
-
-        function generateObstacles() {
-            obstacles = [];
-            if (level >= 3) {
-                const count = (level - 2) * 2;
-                for (let i = 0; i < count; i++) {
-                    obstacles.push({ x: 5 + i * 4, y: 5 });
-                    obstacles.push({ x: tileCount - 6 - i * 4, y: tileCount - 6 });
-                }
-            }
         }
 
         function mainLoop() {
@@ -368,7 +310,29 @@
                 return;
             }
             
-            const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+            let head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+            // Wall Collision & Danger Threshold (Score 50)
+            if (score >= 50) {
+                if (!alertShown) {
+                    alertShown = true;
+                    alert("⚠️ WARNING: Score reached 50! Walls are now DANGEROUS! Hitting the wall will end the game!");
+                    // Turn container border bright red for danger
+                    const container = document.getElementById('gameBorderContainer');
+                    container.className = "relative rounded-2xl overflow-hidden border-4 border-red-600 shadow-[0_0_25px_rgba(239,68,68,0.8)] bg-black/70 flex justify-center items-center transition-all duration-300";
+                }
+                if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+                    triggerGameOver();
+                    return;
+                }
+            } else {
+                // Wrap-around portal walls before score 50
+                if (head.x < 0) head.x = tileCount - 1;
+                if (head.x >= tileCount) head.x = 0;
+                if (head.y < 0) head.y = tileCount - 1;
+                if (head.y >= tileCount) head.y = 0;
+            }
+
             snake.unshift(head);
 
             if (head.x === food.x && head.y === food.y) {
@@ -382,48 +346,27 @@
                     document.getElementById('highScoreVal').innerText = score;
                 }
 
-                let calculatedLevel = Math.min(5, Math.floor(score / 50) + 1);
-                if (calculatedLevel > level) {
-                    level = calculatedLevel;
-                    document.getElementById('levelVal').innerText = level;
-                    generateObstacles();
-                    speedDelay = Math.max(50, 140 - (level * 16));
-                    clearInterval(gameInterval);
-                    gameInterval = setInterval(mainLoop, speedDelay);
-                }
                 spawnFood();
             } else {
                 snake.pop();
             }
 
-            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
-                triggerGameOver();
-                return;
-            }
+            // Self-Collision (Snake hits its own tail/body)
             for (let i = 1; i < snake.length; i++) {
                 if (head.x === snake[i].x && head.y === snake[i].y) {
                     triggerGameOver();
                     return;
                 }
             }
-            if (obstacles.some(obs => obs.x === head.x && obs.y === head.y)) {
-                triggerGameOver();
-                return;
-            }
             renderGame();
         }
 
         function renderGame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            ctx.fillStyle = '#52525b';
-            obstacles.forEach(obs => {
-                ctx.fillRect(obs.x * gridSize, obs.y * gridSize, gridSize - 2, gridSize - 2);
-            });
 
             ctx.fillStyle = food.color;
             ctx.shadowColor = food.color;
-            ctx.shadowBlur = 10;
+            ctx.shadowBlur = 8;
             ctx.beginPath();
             ctx.arc((food.x * gridSize) + gridSize / 2, (food.y * gridSize) + gridSize / 2, gridSize / 2 - 2, 0, Math.PI * 2);
             ctx.fill();
@@ -443,31 +386,16 @@
                     ctx.fillStyle = index === 0 ? '#22c55e' : '#15803d';
                 }
                 ctx.fillRect(part.x * gridSize, part.y * gridSize, gridSize - 2, gridSize - 2);
-                
-                if (index === 0 && snakeStyle === 'eyes') {
-                    ctx.fillStyle = '#000';
-                    ctx.fillRect(part.x * gridSize + 5, part.y * gridSize + 5, 3, 3);
-                    ctx.fillRect(part.x * gridSize + 14, part.y * gridSize + 14, 3, 3);
-                }
             });
-            ctx.shadowBlur = 0;
         }
 
         function spawnFood() {
-            const types = [
-                { color: '#ff3333', points: 10 },
-                { color: '#ec4899', points: 25 },
-                { color: '#fbbf24', points: 50 }
-            ];
-            const chosen = types[Math.floor(Math.random() * types.length)];
-            food.color = chosen.color;
-            food.points = chosen.points;
+            food.color = '#ff3333';
+            food.points = 10;
             food.x = Math.floor(Math.random() * tileCount);
             food.y = Math.floor(Math.random() * tileCount);
 
-            let conflict = snake.some(p => p.x === food.x && p.y === food.y) || 
-                           obstacles.some(o => o.x === food.x && o.y === food.y);
-            if (conflict) spawnFood();
+            if (snake.some(p => p.x === food.x && p.y === food.y)) spawnFood();
         }
 
         function saveScoreAndLeaderboard() {
@@ -486,6 +414,7 @@
 
         function triggerGameOver() {
             playSound('boom');
+            stopMusic();
             gameActive = false;
             if (gameInterval) clearInterval(gameInterval);
 
@@ -494,8 +423,9 @@
             
             document.getElementById('playerResultText').innerText = `Player: ${playerName}`;
             document.getElementById('finalScoreText').innerText = `Your Score: ${score}`;
-            document.getElementById('finalHighScoreText').innerText = `Best Score: ${playerBest ? playerBest.score : score}`;
+            document.getElementById('finalHighScoreText').innerText = `High Score: ${playerBest ? playerBest.score : score}`;
             
+            renderLeaderboard();
             switchScreen('gameOverScreen');
             document.getElementById('topBar').classList.add('hidden');
         }
@@ -504,10 +434,12 @@
             document.getElementById('topBar').classList.remove('hidden');
             switchScreen(''); 
             startGame();
+            startMusic();
         }
 
         function returnToHome() {
             gameActive = false;
+            stopMusic();
             if (gameInterval) clearInterval(gameInterval);
             document.getElementById('topBar').classList.add('hidden');
             switchScreen('homeScreen');
@@ -517,9 +449,11 @@
             if (!gameActive) return;
             isPaused = !isPaused;
             if (isPaused) {
+                bgAudio.pause();
                 switchScreen('pauseScreen');
                 document.getElementById('topBar').classList.remove('hidden');
             } else {
+                bgAudio.play();
                 switchScreen('');
                 document.getElementById('topBar').classList.remove('hidden');
             }
@@ -533,7 +467,7 @@
             if (direction === 'RIGHT' && dx === 0) { dx = 1; dy = 0; }
         }
 
-        /* MOBILE TOUCH SWIPE GESTURES */
+        /* TOUCH SWIPE GESTURES */
         let touchStartX = 0;
         let touchStartY = 0;
         const touchArea = document.getElementById('gameTouchArea');
@@ -572,7 +506,7 @@
             touchStartY = 0;
         }, { passive: true });
 
-        /* LAPTOP KEYBOARD ARROW KEYS */
+        /* LAPTOP KEYBOARD ARROWS */
         window.addEventListener("keydown", e => {
             switch (e.key) {
                 case "ArrowUp": setDir('UP'); e.preventDefault(); break;
