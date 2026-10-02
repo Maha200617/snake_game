@@ -28,7 +28,6 @@
         }
         .arcade-font { font-family: 'Press Start 2P', monospace; }
 
-        /* Themes */
         body.theme-neon { background-color: #08080a; color: #ffffff; }
         body.theme-dark { background-color: #121212; color: #e0e0e0; }
         body.theme-light { background-color: #f0f4f8; color: #1e293b; }
@@ -64,7 +63,6 @@
 
     <!-- MAIN GAME VIEWPORT -->
     <main id="gameTouchArea" class="relative flex justify-center items-center my-auto w-full flex-grow">
-        <!-- CLEAN GAME CONTAINER -->
         <div id="gameBorderContainer" class="relative rounded-2xl overflow-hidden border-4 border-zinc-700 shadow-2xl bg-black/60 flex justify-center items-center transition-all duration-300">
             <canvas id="gameCanvas" width="520" height="520" class="block max-w-full max-h-[70vh] object-contain"></canvas>
             
@@ -177,8 +175,10 @@
         let snakeStyle = 'classic';
         let alertShown = false;
 
-        let bgAudio = new Audio('suzume.mp3');
+        let bgAudio = new Audio();
+        bgAudio.src = 'suzume.mp3';
         bgAudio.loop = true;
+        bgAudio.load();
 
         function playSound(type) {
             if (document.getElementById('soundToggle').value === 'off') return;
@@ -210,10 +210,9 @@
             const selectedSong = document.getElementById('musicSelect').value;
             if (selectedSong === 'off') return;
 
-            bgAudio.src = 'suzume.mp3';
             bgAudio.currentTime = 0;
             bgAudio.play().catch(err => {
-                console.log("Audio play blocked by browser:", err);
+                console.log("Audio play error:", err);
             });
         }
 
@@ -288,7 +287,6 @@
             gameActive = true;
             alertShown = false;
 
-            // Reset container border to normal grey color
             const container = document.getElementById('gameBorderContainer');
             container.className = "relative rounded-2xl overflow-hidden border-4 border-zinc-700 shadow-2xl bg-black/60 flex justify-center items-center transition-all duration-300";
             
@@ -316,8 +314,7 @@
             if (score >= 50) {
                 if (!alertShown) {
                     alertShown = true;
-                    alert("⚠️ WARNING: Score reached 50! Walls are now DANGEROUS! Hitting the wall will end the game!");
-                    // Turn container border bright red for danger
+                    alert("⚠️️ WARNING: Score reached 50! Walls are now DANGEROUS! Hitting the wall will end the game!");
                     const container = document.getElementById('gameBorderContainer');
                     container.className = "relative rounded-2xl overflow-hidden border-4 border-red-600 shadow-[0_0_25px_rgba(239,68,68,0.8)] bg-black/70 flex justify-center items-center transition-all duration-300";
                 }
@@ -326,7 +323,6 @@
                     return;
                 }
             } else {
-                // Wrap-around portal walls before score 50
                 if (head.x < 0) head.x = tileCount - 1;
                 if (head.x >= tileCount) head.x = 0;
                 if (head.y < 0) head.y = tileCount - 1;
@@ -351,7 +347,6 @@
                 snake.pop();
             }
 
-            // Self-Collision (Snake hits its own tail/body)
             for (let i = 1; i < snake.length; i++) {
                 if (head.x === snake[i].x && head.y === snake[i].y) {
                     triggerGameOver();
