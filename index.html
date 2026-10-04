@@ -168,7 +168,6 @@
         let dx = 0;
         let dy = 0;
         let score = 0;
-        let foodEatenCount = 0;
         let playerName = "Player";
         let highScores = JSON.parse(localStorage.getItem("snakeLeaderboard")) || [];
         let gameInterval = null;
@@ -177,6 +176,8 @@
         let speedDelay = 120;
         let snakeStyle = 'classic';
         let alertShown = false;
+        let speedChanged = false;
+        let obstaclesAlertShown = false;
 
         let bgAudio = new Audio();
         bgAudio.loop = true;
@@ -274,14 +275,24 @@
             startGame();
         }
 
-        function generateObstacles() {
-            obstacles = [
-                { x: 6, y: 6 }, { x: 7, y: 6 }, { x: 8, y: 6 },
-                { x: 17, y: 6 }, { x: 18, y: 6 }, { x: 19, y: 6 },
-                { x: 12, y: 12 }, { x: 13, y: 12 }, { x: 14, y: 12 },
-                { x: 6, y: 18 }, { x: 7, y: 18 }, { x: 8, y: 18 },
-                { x: 17, y: 18 }, { x: 18, y: 18 }, { x: 19, y: 18 }
-            ];
+        function generateSafeObstacles(count) {
+            let newObs = [];
+            let attempts = 0;
+            while (newObs.length < count && attempts < 100) {
+                let rx = Math.floor(Math.random() * (tileCount - 4)) + 2;
+                let ry = Math.floor(Math.random() * (tileCount - 4)) + 2;
+                
+                // Check if position conflicts with snake or food or existing obstacles
+                let conflictWithSnake = snake.some(p => p.x === rx && p.y === ry);
+                let conflictWithFood = (food.x === rx && food.y === ry);
+                let conflictWithObs = newObs.some(o => o.x === rx && o.y === ry);
+
+                if (!conflictWithSnake && !conflictWithFood && !conflictWithObs) {
+                    newObs.push({ x: rx, y: ry });
+                }
+                attempts++;
+            }
+            obstacles = newObs;
         }
 
         function startGame() {
@@ -295,11 +306,12 @@
             dx = 0;
             dy = 0;
             score = 0;
-            foodEatenCount = 0;
             speedDelay = 120;
             isPaused = false;
             gameActive = true;
             alertShown = false;
+            speedChanged = false;
+            obstaclesAlertShown = false;
             obstacles = [];
 
             const container = document.getElementById('gameBorderContainer');
@@ -325,14 +337,13 @@
             
             let head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-            // Wall Collision & Danger Threshold (Score 80 for Brick Obstacles)
-            if (score >= 80) {
+            // Wall Collision & Danger Threshold (Score 50)
+            if (score >= 50) {
                 if (!alertShown) {
                     alertShown = true;
-                    alert("⚠ WARNING: Score 80 reached! Brick obstacles have appeared in the arena!");
-                    generateObstacles();
+                    alert("⚠ WARNING: Score reached 50! Walls are now DANGEROUS! Hitting the wall will end the game!");
                     const container = document.getElementById('gameBorderContainer');
-                    container.className = "relative rounded-2xl overflow-hidden border-4 border-amber-600 shadow-[0_0_25px_rgba(217,119,6,0.8)] bg-black/70 flex justify-center items-center transition-all duration-300";
+                    container.className = "relative rounded-2xl overflow-hidden border-4 border-red-600 shadow-[0_0_25px_rgba(239,68,68,0.8)] bg-black/70 flex justify-center items-center transition-all duration-300";
                 }
                 if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
                     triggerGameOver();
@@ -345,23 +356,41 @@
                 if (head.y >= tileCount) head.y = 0;
             }
 
+            // Speed change at score 80 (first time)
+            if (score >= 80 && !speedChanged) {
+                speedChanged = true;
+                speedDelay = 100;
+                clearInterval(gameInterval);
+                gameInterval = setInterval(mainLoop, speedDelay);
+            }
+
+            // Obstacles logic based on score ranges (cycling 100, 150, 200, 230...)
+            let scoreInCycle = score % 130;
+            if (score >= 100) {
+                if (!obstaclesAlertShown) {
+                    obstaclesAlertShown = true;
+                    alert("⚠ Obstacles are ahead!");
+                }
+
+                if (scoreInCycle >= 100 && scoreInCycle < 110 && obstacles.length !== 2) {
+                    generateSafeObstacles(2); // First two obstacles
+                } else if (scoreInCycle >= 110 && scoreInCycle < 120 && obstacles.length !== 2) {
+                    generateSafeObstacles(2); // Second two obstacles (different position)
+                } else if (scoreInCycle >= 120 && obstacles.length !== 3) {
+                    generateSafeObstacles(3); // Three obstacles
+                }
+            } else {
+                obstacles = [];
+                obstaclesAlertShown = false;
+            }
+
             snake.unshift(head);
 
             if (head.x === food.x && head.y === food.y) {
                 playSound('pop');
                 score += food.points;
-                foodEatenCount++;
                 document.getElementById('scoreVal').innerText = score;
                 
-                // Gradual Speed Increase after score 100, every 3 steps (food items)
-                if (score >= 100 && foodEatenCount % 3 === 0) {
-                    if (speedDelay > 50) {
-                        speedDelay -= 5; // Speed peruguthundi (delay taggutundi)
-                        clearInterval(gameInterval);
-                        gameInterval = setInterval(mainLoop, speedDelay);
-                    }
-                }
-
                 let playerBest = highScores.find(p => p.name.toLowerCase() === playerName.toLowerCase());
                 let currentBest = playerBest ? playerBest.score : 0;
                 if (score > currentBest) {
@@ -382,12 +411,10 @@
             }
 
             // Brick Obstacles Collision Check
-            if (score >= 80) {
-                for (let obs of obstacles) {
-                    if (head.x === obs.x && head.y === obs.y) {
-                        triggerGameOver();
-                        return;
-                    }
+            for (let obs of obstacles) {
+                if (head.x === obs.x && head.y === obs.y) {
+                    triggerGameOver();
+                    return;
                 }
             }
 
@@ -397,16 +424,14 @@
         function renderGame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Draw Brick Obstacles if score >= 80
-            if (score >= 80) {
-                obstacles.forEach(obs => {
-                    ctx.fillStyle = '#b45309'; // Brick brownish color
-                    ctx.strokeStyle = '#78350f';
-                    ctx.lineWidth = 2;
-                    ctx.fillRect(obs.x * gridSize, obs.y * gridSize, gridSize - 2, gridSize - 2);
-                    ctx.strokeRect(obs.x * gridSize, obs.y * gridSize, gridSize - 2, gridSize - 2);
-                });
-            }
+            // Draw Brick Obstacles
+            obstacles.forEach(obs => {
+                ctx.fillStyle = '#b45309'; // Brick brownish color
+                ctx.strokeStyle = '#78350f';
+                ctx.lineWidth = 2;
+                ctx.fillRect(obs.x * gridSize, obs.y * gridSize, gridSize - 2, gridSize - 2);
+                ctx.strokeRect(obs.x * gridSize, obs.y * gridSize, gridSize - 2, gridSize - 2);
+            });
 
             // Draw Food
             ctx.fillStyle = food.color;
