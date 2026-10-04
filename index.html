@@ -164,9 +164,11 @@
 
         let snake = [];
         let food = { x: 5, y: 5, color: '#ff3333', points: 10 };
+        let obstacles = [];
         let dx = 0;
         let dy = 0;
         let score = 0;
+        let foodEatenCount = 0;
         let playerName = "Player";
         let highScores = JSON.parse(localStorage.getItem("snakeLeaderboard")) || [];
         let gameInterval = null;
@@ -272,6 +274,16 @@
             startGame();
         }
 
+        function generateObstacles() {
+            obstacles = [
+                { x: 6, y: 6 }, { x: 7, y: 6 }, { x: 8, y: 6 },
+                { x: 17, y: 6 }, { x: 18, y: 6 }, { x: 19, y: 6 },
+                { x: 12, y: 12 }, { x: 13, y: 12 }, { x: 14, y: 12 },
+                { x: 6, y: 18 }, { x: 7, y: 18 }, { x: 8, y: 18 },
+                { x: 17, y: 18 }, { x: 18, y: 18 }, { x: 19, y: 18 }
+            ];
+        }
+
         function startGame() {
             if (gameInterval) clearInterval(gameInterval);
             let mid = Math.floor(tileCount / 2);
@@ -283,9 +295,12 @@
             dx = 0;
             dy = 0;
             score = 0;
+            foodEatenCount = 0;
+            speedDelay = 120;
             isPaused = false;
             gameActive = true;
             alertShown = false;
+            obstacles = [];
 
             const container = document.getElementById('gameBorderContainer');
             container.className = "relative rounded-2xl overflow-hidden border-4 border-zinc-700 shadow-2xl bg-black/60 flex justify-center items-center transition-all duration-300";
@@ -310,13 +325,14 @@
             
             let head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-            // Wall Collision & Danger Threshold (Score 50)
-            if (score >= 50) {
+            // Wall Collision & Danger Threshold (Score 80 for Brick Obstacles)
+            if (score >= 80) {
                 if (!alertShown) {
                     alertShown = true;
-                    alert("⚠ WARNING: Score reached 50! Walls are now DANGEROUS! Hitting the wall will end the game!");
+                    alert("⚠ WARNING: Score 80 reached! Brick obstacles have appeared in the arena!");
+                    generateObstacles();
                     const container = document.getElementById('gameBorderContainer');
-                    container.className = "relative rounded-2xl overflow-hidden border-4 border-red-600 shadow-[0_0_25px_rgba(239,68,68,0.8)] bg-black/70 flex justify-center items-center transition-all duration-300";
+                    container.className = "relative rounded-2xl overflow-hidden border-4 border-amber-600 shadow-[0_0_25px_rgba(217,119,6,0.8)] bg-black/70 flex justify-center items-center transition-all duration-300";
                 }
                 if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
                     triggerGameOver();
@@ -334,8 +350,18 @@
             if (head.x === food.x && head.y === food.y) {
                 playSound('pop');
                 score += food.points;
+                foodEatenCount++;
                 document.getElementById('scoreVal').innerText = score;
                 
+                // Gradual Speed Increase after score 100, every 3 steps (food items)
+                if (score >= 100 && foodEatenCount % 3 === 0) {
+                    if (speedDelay > 50) {
+                        speedDelay -= 5; // Speed peruguthundi (delay taggutundi)
+                        clearInterval(gameInterval);
+                        gameInterval = setInterval(mainLoop, speedDelay);
+                    }
+                }
+
                 let playerBest = highScores.find(p => p.name.toLowerCase() === playerName.toLowerCase());
                 let currentBest = playerBest ? playerBest.score : 0;
                 if (score > currentBest) {
@@ -347,18 +373,42 @@
                 snake.pop();
             }
 
+            // Self Collision Check
             for (let i = 1; i < snake.length; i++) {
                 if (head.x === snake[i].x && head.y === snake[i].y) {
                     triggerGameOver();
                     return;
                 }
             }
+
+            // Brick Obstacles Collision Check
+            if (score >= 80) {
+                for (let obs of obstacles) {
+                    if (head.x === obs.x && head.y === obs.y) {
+                        triggerGameOver();
+                        return;
+                    }
+                }
+            }
+
             renderGame();
         }
 
         function renderGame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            // Draw Brick Obstacles if score >= 80
+            if (score >= 80) {
+                obstacles.forEach(obs => {
+                    ctx.fillStyle = '#b45309'; // Brick brownish color
+                    ctx.strokeStyle = '#78350f';
+                    ctx.lineWidth = 2;
+                    ctx.fillRect(obs.x * gridSize, obs.y * gridSize, gridSize - 2, gridSize - 2);
+                    ctx.strokeRect(obs.x * gridSize, obs.y * gridSize, gridSize - 2, gridSize - 2);
+                });
+            }
+
+            // Draw Food
             ctx.fillStyle = food.color;
             ctx.shadowColor = food.color;
             ctx.shadowBlur = 8;
@@ -367,6 +417,7 @@
             ctx.fill();
             ctx.shadowBlur = 0;
 
+            // Draw Snake
             snake.forEach((part, index) => {
                 if (snakeStyle === 'classic') {
                     ctx.fillStyle = index === 0 ? '#10b981' : '#059669';
@@ -390,7 +441,12 @@
             food.x = Math.floor(Math.random() * tileCount);
             food.y = Math.floor(Math.random() * tileCount);
 
-            if (snake.some(p => p.x === food.x && p.y === food.y)) spawnFood();
+            // Ensure food does not spawn on snake or obstacles
+            let collisionWithSnake = snake.some(p => p.x === food.x && p.y === food.y);
+            let collisionWithObs = obstacles.some(obs => obs.x === food.x && obs.y === food.y);
+            if (collisionWithSnake || collisionWithObs) {
+                spawnFood();
+            }
         }
 
         function saveScoreAndLeaderboard() {
