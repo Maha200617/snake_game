@@ -111,7 +111,8 @@
                     <div>
                         <label class="text-[10px] text-zinc-400 font-bold block mb-1">Background Music:</label>
                         <select id="musicSelect" class="w-full bg-zinc-900 border border-zinc-700 text-white text-xs p-2 rounded-xl outline-none">
-                            <option value="suzume">Suzume</option>
+                            <option value="suzume.mp3">Suzume</option>
+                            <option value="alo alo.mp3">Alo Alo (Paro Song)</option>
                             <option value="off">Muted (Off)</option>
                         </select>
                     </div>
@@ -176,9 +177,7 @@
         let alertShown = false;
 
         let bgAudio = new Audio();
-        bgAudio.src = 'suzume.mp3';
         bgAudio.loop = true;
-        bgAudio.load();
 
         function playSound(type) {
             if (document.getElementById('soundToggle').value === 'off') return;
@@ -210,6 +209,7 @@
             const selectedSong = document.getElementById('musicSelect').value;
             if (selectedSong === 'off') return;
 
+            bgAudio.src = selectedSong;
             bgAudio.currentTime = 0;
             bgAudio.play().catch(err => {
                 console.log("Audio play error:", err);
@@ -314,7 +314,7 @@
             if (score >= 50) {
                 if (!alertShown) {
                     alertShown = true;
-                    alert("⚠️️ WARNING: Score reached 50! Walls are now DANGEROUS! Hitting the wall will end the game!");
+                    alert("⚠ WARNING: Score reached 50! Walls are now DANGEROUS! Hitting the wall will end the game!");
                     const container = document.getElementById('gameBorderContainer');
                     container.className = "relative rounded-2xl overflow-hidden border-4 border-red-600 shadow-[0_0_25px_rgba(239,68,68,0.8)] bg-black/70 flex justify-center items-center transition-all duration-300";
                 }
