@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Snake Game - Created by Maha</title>
+    <!-- Favicon Icon Added Here -->
+    <link rel="icon" type="image/png" href="https://img.icons8.com/color/48/snake.png">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -282,7 +284,6 @@
                 let rx = Math.floor(Math.random() * (tileCount - 4)) + 2;
                 let ry = Math.floor(Math.random() * (tileCount - 4)) + 2;
                 
-                // Check if position conflicts with snake or food or existing obstacles
                 let conflictWithSnake = snake.some(p => p.x === rx && p.y === ry);
                 let conflictWithFood = (food.x === rx && food.y === ry);
                 let conflictWithObs = newObs.some(o => o.x === rx && o.y === ry);
@@ -337,7 +338,6 @@
             
             let head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-            // Wall Collision & Danger Threshold (Score 50)
             if (score >= 50) {
                 if (!alertShown) {
                     alertShown = true;
@@ -356,7 +356,6 @@
                 if (head.y >= tileCount) head.y = 0;
             }
 
-            // Speed change at score 80 (first time)
             if (score >= 80 && !speedChanged) {
                 speedChanged = true;
                 speedDelay = 100;
@@ -364,7 +363,6 @@
                 gameInterval = setInterval(mainLoop, speedDelay);
             }
 
-            // Obstacles logic based on score ranges (cycling 100, 150, 200, 230...)
             let scoreInCycle = score % 130;
             if (score >= 100) {
                 if (!obstaclesAlertShown) {
@@ -373,11 +371,11 @@
                 }
 
                 if (scoreInCycle >= 100 && scoreInCycle < 110 && obstacles.length !== 2) {
-                    generateSafeObstacles(2); // First two obstacles
+                    generateSafeObstacles(2);
                 } else if (scoreInCycle >= 110 && scoreInCycle < 120 && obstacles.length !== 2) {
-                    generateSafeObstacles(2); // Second two obstacles (different position)
+                    generateSafeObstacles(2);
                 } else if (scoreInCycle >= 120 && obstacles.length !== 3) {
-                    generateSafeObstacles(3); // Three obstacles
+                    generateSafeObstacles(3);
                 }
             } else {
                 obstacles = [];
@@ -402,7 +400,6 @@
                 snake.pop();
             }
 
-            // Self Collision Check
             for (let i = 1; i < snake.length; i++) {
                 if (head.x === snake[i].x && head.y === snake[i].y) {
                     triggerGameOver();
@@ -410,7 +407,6 @@
                 }
             }
 
-            // Brick Obstacles Collision Check
             for (let obs of obstacles) {
                 if (head.x === obs.x && head.y === obs.y) {
                     triggerGameOver();
@@ -424,16 +420,14 @@
         function renderGame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Draw Brick Obstacles
             obstacles.forEach(obs => {
-                ctx.fillStyle = '#b45309'; // Brick brownish color
+                ctx.fillStyle = '#b45309';
                 ctx.strokeStyle = '#78350f';
                 ctx.lineWidth = 2;
                 ctx.fillRect(obs.x * gridSize, obs.y * gridSize, gridSize - 2, gridSize - 2);
                 ctx.strokeRect(obs.x * gridSize, obs.y * gridSize, gridSize - 2, gridSize - 2);
             });
 
-            // Draw Food
             ctx.fillStyle = food.color;
             ctx.shadowColor = food.color;
             ctx.shadowBlur = 8;
@@ -442,7 +436,6 @@
             ctx.fill();
             ctx.shadowBlur = 0;
 
-            // Draw Snake
             snake.forEach((part, index) => {
                 if (snakeStyle === 'classic') {
                     ctx.fillStyle = index === 0 ? '#10b981' : '#059669';
@@ -466,7 +459,6 @@
             food.x = Math.floor(Math.random() * tileCount);
             food.y = Math.floor(Math.random() * tileCount);
 
-            // Ensure food does not spawn on snake or obstacles
             let collisionWithSnake = snake.some(p => p.x === food.x && p.y === food.y);
             let collisionWithObs = obstacles.some(obs => obs.x === food.x && obs.y === food.y);
             if (collisionWithSnake || collisionWithObs) {
@@ -543,7 +535,6 @@
             if (direction === 'RIGHT' && dx === 0) { dx = 1; dy = 0; }
         }
 
-        /* TOUCH SWIPE GESTURES */
         let touchStartX = 0;
         let touchStartY = 0;
         const touchArea = document.getElementById('gameTouchArea');
@@ -582,7 +573,6 @@
             touchStartY = 0;
         }, { passive: true });
 
-        /* LAPTOP KEYBOARD ARROWS */
         window.addEventListener("keydown", e => {
             switch (e.key) {
                 case "ArrowUp": setDir('UP'); e.preventDefault(); break;
